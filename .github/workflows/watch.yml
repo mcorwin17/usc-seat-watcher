@@ -1,0 +1,43 @@
+name: seat-watch
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: seat-watch
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check seats
+        id: check
+        run: |
+          set -e
+          node check.mjs | tee alerts.txt
+          echo "found=$([ -s alerts.txt ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+      - name: File alert issue (emails the owner)
+        if: steps.check.outputs.found == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "🪑 $(head -1 alerts.txt | cut -c1-80)" \
+            --body "$(cat alerts.txt)
+
+          Checked at $(date -u '+%Y-%m-%d %H:%M UTC'). Go: https://ssb.onecarolina.sc.edu" \
+            --repo "$GITHUB_REPOSITORY"
+      - name: Persist state
+        run: |
+          git config user.name "seat-watch-bot"
+          git config user.email "actions@github.com"
+          git add state.json
+          git diff --cached --quiet || git commit -m "state $(date -u '+%Y-%m-%dT%H:%MZ')"
+          git push
