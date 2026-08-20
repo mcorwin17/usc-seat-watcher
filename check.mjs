@@ -6,7 +6,6 @@ const WATCH = [
   { crn: '15405', label: 'MATH 344L 002 (Fri 10:50am lab)', subject: 'MATH', num: '344L' },
   { crn: '15406', label: 'MATH 344L 003 (Fri 12:00pm lab)', subject: 'MATH', num: '344L' },
   { crn: '16035', label: 'CSCE 520 J60 (Database Design, online)', subject: 'CSCE', num: '520' },
-  { crn: '12052', label: 'TEST ALERT (CSCE 490 J10 — ignore, verifying email pipeline)', subject: 'CSCE', num: '490' },
 ];
 const TERM = '202608';
 const B = 'https://banner.onecarolina.sc.edu/StudentRegistrationSsb/ssb';
